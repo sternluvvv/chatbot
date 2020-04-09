@@ -30,7 +30,7 @@ class PatternResponder(Responder) : #PatternResponderクラスを作る#
         for ptn in self._dictionary.pattern : #pattern.txtの中身をptternでパースした後の1行#
             matcher = re.search(ptn['pattern'],text) 
             if matcher :    #もし、patternの方とresponseの打つ文字（text）の中身がマッチした場合#
-                chosen_response = choice(ptn['phrases'].split('|'))    #phrasesの方のいずれかを選ぶ#
+                chosen_response = choice(ptn['phrases'])    #phrasesの方のいずれかを選ぶ#
                 return chosen_response.replace('%match%',matcher[0]) #%match%と打った文字(text)で合っているものを交換#
         return choice(self._dictionary.random)      #その他はrandom.txtからチョイス#
 

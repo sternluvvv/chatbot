@@ -12,4 +12,6 @@ if __name__ == '__main__' :      #import main としたとき勝手に動かな�
             break
 
         response = proto.dialogue(text) #proto(Unmo)のdialoge(What(Responder)のresponse)｛って何？｝#
-        print('{prompt}{response}'.format(prompt=build_prompt(proto),response = response))   #prot:What> って何？#となる
+        print('{prompt}{response}'.format(prompt=build_prompt(proto),response = response))   #prot:What> って何？#となる#
+    
+    proto.save()
