@@ -1,26 +1,32 @@
 from random import choice , randrange
-from responder import WhatResponder, RandomResponder, PatternResponder #responder.pyからResponderと言う名前のロード(Responder('What')#
+from janome.tokenizer import Tokenizer
+from responder import WhatResponder, RandomResponder, PatternResponder, TemplateResponder #responder.pyからResponderと言う名前のロード(Responder('What')#
 from dictionary import Dictionary
+import morph
 
 class Unmo:
     def __init__(self,name) :
+        self._tokenizer = Tokenizer()
         self._dictionary = Dictionary()
-        self._responders = {'what':WhatResponder('What',self._dictionary),'random':RandomResponder('Random',self._dictionary),'pattern':PatternResponder('Pattern',self._dictionary),}    
+        self._responders = {'what':WhatResponder('What',self._dictionary),'random':RandomResponder('Random',self._dictionary),'pattern':PatternResponder('Pattern',self._dictionary),'template':TemplateResponder('Template',self._dictionary)}    
          #辞書型Whatの中にWhatResponder・・・ Responderクラスに第３因子？が増えた為。Dictionaryクラスをresponder.pyにインポートしなくてもいい代わりに#
         self._name = name
         self._responder = self._responders['pattern'] #Unmoにはself._respondersのpatternキー(PatternResonder)クラスが入ってる#
 
     def dialogue(self,text) :
         chance = randrange(0,100)
-        if chance in range(0,59) :
+        if chance in range(0,39) :
             self._responder = self._responders['pattern']
-        elif chance in range(60,89) :
+        elif chance in range(40,69) :
+            self._responder = self._responders['template']
+        elif chance in range(70,89) :
             self._responder = self._responders['random']
         else :
             self._responder = self._responders['what']
         
-        response = self._responder.response(text) #どれかのresponseをresponseとする#
-        self._dictionary.study(text) #ないものは記憶させる#
+        parts = morph.analyze(text)
+        response = self._responder.response(text,parts) #どれかのresponseをresponseとする#
+        self._dictionary.study(text,parts) #ないものは記憶させる#
         return response
 
                 # chosen_key = choice(list(self._responders.keys()))これに確率をつけたのが上 #辞書のキーをlistにして、えらぶ#

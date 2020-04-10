@@ -10,8 +10,12 @@ if __name__ == '__main__' :      #import main としたとき勝手に動かな�
         text = input('>')
         if not text :
             break
-
-        response = proto.dialogue(text) #proto(Unmo)のdialoge(What(Responder)のresponse)｛って何？｝#
-        print('{prompt}{response}'.format(prompt=build_prompt(proto),response = response))   #prot:What> って何？#となる#
+        try :
+            response = proto.dialogue(text) #proto(Unmo)のdialoge(What(Responder)のresponse)｛って何？｝#
+        except IndexError as error :
+            print('{}:{}'.format(type(error).__name__, str(error)))
+            print('警告：辞書が空です。(Responder:{})'.format(proto.responder_name))
+        else :
+            print('{prompt}{response}'.format(prompt=build_prompt(proto),response = response))   #prot:What> って何？#となる#
     
     proto.save()
