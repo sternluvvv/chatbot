@@ -44,3 +44,35 @@ class Unmo:
     def responder_name(self):
         return self._responder.name #Randomとでるはず#
 
+    def main() :
+        markov = Markov()
+        sep = r'[。?？！!   ]+'
+        filename = sys.argv[1]
+        dicfile = '{}.dat'.format(filename)
+        if os.path.exists(dicfile) :
+            markov.load(dicfile)
+
+        else :
+            with open(filename, encoding = 'utf-8') as f :
+                sentences = []
+                for line in f :
+                    sentences.extend(re.split(sep, line.strip()))
+            for sentence in sentenses :
+                if sentence :
+                    markov.add_sentence(morph.analyze(sentence))
+                    print('.',end = '')
+                    sys.stdout.flush()
+            markov.save(dicfile)
+        print('\n')
+
+        while True :
+            linr = input('>')
+            if not line :
+                break
+            parts = morph.analyze(line)
+            keyword = next((word for word,part in parts if morph.is_keyword(part)),'')
+
+    if __name__ == '__main__' :
+        main()
+                
+
