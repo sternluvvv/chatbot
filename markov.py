@@ -4,9 +4,9 @@ from random import choice
 from collections import defaultdict
 import re
 import copy
-import tqdm
 import dill                     #dill[pythonのデータをファイルに保存したり、読み込む]#
 import morph
+import tqdm
 
 class Markov :
     ENDMARK = '%END%'
@@ -22,7 +22,7 @@ class Markov :
             return
         parts = copy.copy(parts) #呼び出し元の値を変更しないようにcopyする#
 
-        prefix1,prefix2 = parts.pop(0)[0],parts.pop(0)[0] #prefix1はpartsの初めの単語　prefix2は次 (品詞,形態素解析の結果)#
+        prefix1,prefix2 = parts.pop(0)[0],parts.pop(0)[0] #prefix1はpartsの初めの単語　prefix2は次#
 
         self.__add_start(prefix1)   #prefixが何回頭にきたか。(文頭に来る単語を測る)#
 
@@ -62,28 +62,30 @@ class Markov :
 
     def save(self, filename) :
             with open(filename, 'wb') as f :
-                dill.dump((self._dic,self._starts),f)   #dill似ついて調べる#
+                dill.dump((self._dic,self._starts),f)   #dillは保存するときに使うpickleで無理ならdill#
+                                                        #(self._dic,self._starts)をfに保存#
     
 
-def main() :
+def main() :        #python markov.py boccha .txtと打つと以下が実行される#
     markov = Markov()
-    sep = r'[。?？！!   ]+'
-    filename = sys.argv[1]
-    dicfile = '{}.dat'.format(filename)
-    if os.path.exists(dicfile) :
-        markov.load(dicfile)
+    sep = r'[。?？！!   ]+'     #エスケープシーケンスを展開せずそのままの値が出る# #+は連続を表わす#
+    filename = sys.argv[1]      #コマンドラインの引数?# つまりbocchan.txtを読み込む#
+    dicfile = '{}.dat'.format(filename)     #bocchan.txt.datを作る#
+    if os.path.exists(dicfile) :    #もしdictfileが存在してたら#
+        markov.load(dicfile)        #dictfileにself._dictとself._startsの保存と読み込み#
 
-    else :
-        with open(filename, encoding = 'utf-8') as f :
+    else :                          #もしdicfile存在していなかったらdicfileの作成#
+        with open(filename, encoding = 'utf-8') as f :  #bocchan.txtを開く#
             sentences = []
-            for line in f :
-                sentences.extend(re.split(sep, line.strip()))
-        for sentence in sentences :
-            if sentence :
-                markov.add_sentence(morph.analyze(sentence))
-                print('.',end = '')
-                sys.stdout.flush()
-        markov.save(dicfile)
+            for line in f :             #bocchan.txtを1行ずつ読み取る#
+                sentences.extend(re.split(sep, line.strip())) #extend(list)でlistの中身を他のリストに追加。
+                                                                #bocchan.txtのsepを消してsntencesに追加#
+        for sentence in tqdm.tqdm(sentences) :
+            if sentence :       #↓1行ごと解析していきself._dicに追加されていく#
+                markov.add_sentence(morph.analyze(sentence))    #add_sentenceにはsurface,partに分れたものを渡すので、analyzeで処理しておく#
+                #print('.',end = '')                             #改行なし#
+                #sys.stdout.flush()                              #改行無しよりsentenceが横に追加されていく#
+        markov.save(dicfile)    #全てをbocchan.txt.datに保存#
     print('\n')
 
     while True :
@@ -93,7 +95,6 @@ def main() :
         parts = morph.analyze(line)
         keyword = next((word for word,part in parts if morph.is_keyword(part)),'')
         print(markov.generate(keyword))
-
 if __name__ == '__main__' :
     main()
                 
